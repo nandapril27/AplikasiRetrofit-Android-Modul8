@@ -29,6 +29,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         User user = userList.get(position);
         holder.textViewName.setText(user.getName());
         holder.textViewEmail.setText(user.getEmail());
+        holder.textViewAgama.setText(user.getAgama());
+        holder.textViewNohp.setText(user.getNohp());
+        holder.textViewAlamat.setText(user.getAlamat());
     }
     @Override
     public int getItemCount() {
@@ -38,11 +41,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public static class UserViewHolder extends RecyclerView.ViewHolder {
         TextView textViewName;
         TextView textViewEmail;
+        TextView textViewAgama;
+        TextView textViewNohp;
+        TextView textViewAlamat;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewName = itemView.findViewById(R.id.textViewName);
             textViewEmail = itemView.findViewById(R.id.textViewEmail);
+            textViewAgama = itemView.findViewById(R.id.textViewAgama);
+            textViewNohp = itemView.findViewById(R.id.textViewNohp);
+            textViewAlamat = itemView.findViewById(R.id.textViewAlamat);
+
         }
     }
 }

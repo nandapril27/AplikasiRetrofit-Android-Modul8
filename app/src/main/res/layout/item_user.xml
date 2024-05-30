@@ -24,5 +24,27 @@
             android:layout_height="wrap_content"
             android:text="Email"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textViewAgama"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agama"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textViewNohp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nohp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textViewAlamat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alamat"
+            android:textSize="16sp" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -50,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
         View view = getLayoutInflater().inflate(R.layout.dialog_add_user, null);
         final EditText editTextName = view.findViewById(R.id.editTextName);
         final EditText editTextEmail = view.findViewById(R.id.editTextEmail);
+        final EditText editTextAgama = view.findViewById(R.id.editTextAgama);
+        final EditText editTextNohp = view.findViewById(R.id.editTextNohp);
+        final EditText editTextAlamat = view.findViewById(R.id.editTextAlamat);
 
         builder.setView(view);
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
@@ -57,16 +60,19 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String name = editTextName.getText().toString();
                 String email = editTextEmail.getText().toString();
-                addUser(name, email);
+                String agama = editTextAgama.getText().toString();
+                String nohp = editTextNohp.getText().toString();
+                String alamat = editTextAlamat.getText().toString();
+                addUser(name, email, agama, nohp, alamat);
             }
         });
         builder.setNegativeButton("Cancel", null);
         builder.create().show();
     }
 
-    private void addUser(String name, String email) {
+    private void addUser(String name, String email, String agama, String nohp, String alamat) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        User user = new User(name, email);
+        User user = new User(name, email, agama, nohp, alamat);
         Call<Void> call = apiService.insertUser(user);
 
         call.enqueue(new Callback<Void>() {
@@ -99,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     userList.clear();
                     userList.addAll(response.body());
                     userAdapter.notifyDataSetChanged();
+                    Toast.makeText(MainActivity.this, "berhasil " + response.message(), Toast.LENGTH_SHORT).show();
                 } else {
                     Log.e("MainActivity", "Response error: " + response.errorBody().toString());
                     Toast.makeText(MainActivity.this, "Failed to fetch users: " + response.message(), Toast.LENGTH_SHORT).show();
