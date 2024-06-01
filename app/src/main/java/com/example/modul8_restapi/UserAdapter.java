@@ -1,5 +1,6 @@
 package com.example.modul8_restapi;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +13,18 @@ import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
     private List<User> userList;
+    private Context context;
+    private MainActivity mainActivity;
 
-    public UserAdapter(List<User> userList) {
+    public UserAdapter(List<User> userList, Context context) {
         this.userList = userList;
-    }
+        this.context = context;
 
+        // Check if context is an instance of MainActivity and set mainActivity
+        if (context instanceof MainActivity) {
+            this.mainActivity = (MainActivity) context;
+        }
+    }
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -32,7 +40,18 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         holder.textViewAgama.setText(user.getAgama());
         holder.textViewNohp.setText(user.getNohp());
         holder.textViewAlamat.setText(user.getAlamat());
-    }
+
+    // Mengatur OnClickListener pada itemView untuk menangani tap pada item
+     holder.itemView.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (context instanceof MainActivity) {
+                ((MainActivity) context).showUpdateDialog(user);
+            }
+        }
+    });
+}
+
     @Override
     public int getItemCount() {
         return userList.size();
@@ -52,7 +71,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             textViewAgama = itemView.findViewById(R.id.textViewAgama);
             textViewNohp = itemView.findViewById(R.id.textViewNohp);
             textViewAlamat = itemView.findViewById(R.id.textViewAlamat);
-
         }
     }
+
+    // Metode untuk mengatur MainActivity yang terkait
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
+
 }
+
+
