@@ -1,15 +1,21 @@
 package com.example.modul8_restapi;
-
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
     private List<User> userList;
@@ -51,10 +57,57 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         }
     });
 }
-
     @Override
     public int getItemCount() {
         return userList.size();
+    }
+
+    // Metode untuk menampilkan dialog konfirmasi penghapusan
+    private void showDeleteConfirmationDialog(final int userId, final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Delete User");
+        builder.setMessage("Are you sure you want to delete this user ?");
+
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                deleteUser(userId, position); // Panggil metode deleteUser dengan userId dan position
+            }
+        });
+
+        builder.setNegativeButton("No", null);
+        builder.show();
+    }
+
+
+    // Metode untuk menghapus pengguna dari daftar dan server
+    private void deleteUser(int userId, int position) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<Void> call = apiService.deleteUser(userId);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    for (int i = 0; i < userList.size(); i++) {
+                        if (userList.get(i).getId() == userId) {
+                            userList.remove(i);
+                            notifyItemRemoved(i);
+                            break;
+                        }}
+                    Toast.makeText(context, "User deleted successfully", Toast.LENGTH_SHORT).show();
+                    userList.remove(position);
+                    notifyItemRemoved(position);
+                    notifyItemRangeChanged(position, userList.size());
+                } else {
+                    Toast.makeText(context, "Failed to delete user: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(context, "Failed to delete user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
@@ -73,12 +126,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             textViewAlamat = itemView.findViewById(R.id.textViewAlamat);
         }
     }
-
     // Metode untuk mengatur MainActivity yang terkait
     public void setMainActivity(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
-
 }
 
 

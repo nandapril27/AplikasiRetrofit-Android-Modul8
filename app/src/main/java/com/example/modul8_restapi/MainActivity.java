@@ -1,16 +1,19 @@
 package com.example.modul8_restapi;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +50,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fetchUsers();
-    }private void showAddUserDialog() {
+    }
+
+    private void showAddUserDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add User");
 
@@ -72,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setNegativeButton("Cancel", null);
         builder.create().show();
     }
+
     private void addUser(String name, String email, String agama, String nohp, String alamat) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         User user = new User(name, email, agama, nohp, alamat);
@@ -93,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
 // ...
 
     private void fetchUsers() {
@@ -102,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         call.enqueue(new Callback<List<User>>() {
             @Override
-           public void onResponse(Call<List<User>> call, Response<List<User>> response) {
+            public void onResponse(Call<List<User>> call, Response<List<User>> response) {
                 if (response.isSuccessful()) {
                     userList.clear();
                     userList.addAll(response.body());
@@ -113,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Failed to fetch users: " + response.message(), Toast.LENGTH_SHORT).show();
                 }
             }
-            
+
             @Override
             public void onFailure(Call<List<User>> call, Throwable t) {
                 Log.e("MainActivity", "Fetch error: ", t);
@@ -122,13 +127,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     private void updateUser(int id, String name, String email, String agama, String nohp, String alamat) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         User user = new User(id, name, email, agama, nohp, alamat);
         Call<Void> call = apiService.updateUser(user);
 
-        Log.d("MainActivity", "Updating user: " + id + ", " + name + ", " + email+ ", " + agama+ ", " + nohp+ ", " + alamat);
+        Log.d("MainActivity", "Updating user: " + id + ", " + name + ", " + email + ", " + agama + ", " + nohp + ", " + alamat);
 
         call.enqueue(new Callback<Void>() {
             @Override
@@ -155,13 +159,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void showUpdateDialog(final User user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Update User");
+        builder.setTitle("Update or Delete User");
 
         View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_update_user, (ViewGroup)
         findViewById(android.R.id.content), false);
         final EditText inputName = viewInflated.findViewById(R.id.editTextName);
         final EditText inputEmail = viewInflated.findViewById(R.id.editTextEmail);
-        final EditText inputAgama= viewInflated.findViewById(R.id.editTextAgama);
+        final EditText inputAgama = viewInflated.findViewById(R.id.editTextAgama);
         final EditText inputNohp = viewInflated.findViewById(R.id.editTextNohp);
         final EditText inputAlamat = viewInflated.findViewById(R.id.editTextAlamat);
         inputName.setText(user.getName());
@@ -190,8 +194,68 @@ public class MainActivity extends AppCompatActivity {
                 dialog.cancel();
             }
         });
+
+        builder.setNeutralButton("Delete", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                showDeleteDialog(user.getId());
+                dialog.dismiss();
+            }
+        });
+
         builder.show();
     }
 
+    private void deleteUser(int id) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<Void> call = apiService.deleteUser(id);
 
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(MainActivity.this, "User deleted successfully", Toast.LENGTH_SHORT).show();
+                    fetchUsers();
+                } else {
+                    Toast.makeText(MainActivity.this, "Failed to delete user: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Failed to delete user: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void showDeleteDialog(final int userId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delete User");
+
+        View viewInflated = LayoutInflater.from(this).inflate(R.layout.dialog_delete_user, (ViewGroup) findViewById(android.R.id.content), false);
+        builder.setView(viewInflated);
+
+        Button buttonConfirmDelete = viewInflated.findViewById(R.id.buttonConfirmDelete);
+        Button buttonCancelDelete = viewInflated.findViewById(R.id.buttonCancelDelete);
+
+        // Inisialisasi dialog di sini
+        final AlertDialog dialog = builder.create();
+
+        buttonConfirmDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteUser(userId);
+                dialog.dismiss();
+            }
+        });
+
+        buttonCancelDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
 }
+

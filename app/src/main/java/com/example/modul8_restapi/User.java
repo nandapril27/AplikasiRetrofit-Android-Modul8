@@ -7,7 +7,6 @@ public class User {
     private String agama;
     private String nohp;
     private String alamat;
-
     public User(int id, String name, String email, String agama, String nohp, String alamat) {
         this.id = id;
         this.name = name;
@@ -15,7 +14,6 @@ public class User {
         this.agama = agama;
         this.nohp = nohp;
         this.alamat = alamat;    }
-
     public User(String name, String email, String agama, String nohp, String alamat) {
         this.name = name;
         this.email = email;
